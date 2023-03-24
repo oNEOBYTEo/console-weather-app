@@ -60,26 +60,26 @@ const getInput = async (message) => {
   return description;
 };
 
-const listDeleteTasks = async (tasks = []) => {
-  const choices = tasks.map((task, i) => {
+const listPlaces = async (places = []) => {
+  const choices = places.map((place, i) => {
     const idx = `${i + 1}.`.green;
 
     return {
-      value: task.id,
-      name: `${idx} ${task.description}`,
+      value: place.id,
+      name: `${idx} ${place.name}`,
     };
   });
 
   choices.unshift({
     value: '0',
-    name: `${'0.'.green} Exit`,
+    name: `${'0.'.green} Cancel`,
   });
 
   const questions = [
     {
       type: 'list',
       name: 'id',
-      message: 'Delete',
+      message: 'Select a location:',
       choices,
     },
   ];
@@ -134,7 +134,7 @@ module.exports = {
   showMenu,
   pause,
   getInput,
-  listDeleteTasks,
+  listPlaces,
   confirm,
   showCheckList,
 };
