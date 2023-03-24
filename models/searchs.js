@@ -1,10 +1,22 @@
+const fs = require('fs');
+
 const axios = require('axios');
 
 class Searchs {
-  history = ['Tegucigalpa', 'Madrid', 'San josé'];
+  history = [];
+  dbPath = './db/database.json';
 
   constructor() {
-    //TODO: leer db si existe
+    this.readDB();
+  }
+
+  get historyCapitalize() {
+    return this.history.map((place) => {
+      let words = place.split(' ');
+      words = words.map((p) => p[0].toUpperCase() + p.substring(1));
+
+      return words.join(' ');
+    });
   }
 
   get paramsMapbox() {
@@ -13,6 +25,10 @@ class Searchs {
       limit: 5,
       language: 'en',
     };
+  }
+
+  get paramsWeather() {
+    return { appid: process.env.OPEN_WEATHER_KEY, units: 'metric', lang: 'en' };
   }
 
   async city(place = '') {
@@ -41,9 +57,7 @@ class Searchs {
         params: {
           lat,
           lon,
-          appid: process.env.OPEN_WEATHER_KEY,
-          units: 'metric',
-          lang: 'en',
+          ...this.paramsWeather,
         },
       });
       const { data } = await instance.get();
@@ -57,6 +71,31 @@ class Searchs {
     } catch (error) {
       console.log(error);
     }
+  }
+
+  addHistory(place = '') {
+    if (this.history.includes(place.toLocaleLowerCase())) {
+      return;
+    }
+
+    this.history = this.history.splice(0, 6);
+
+    this.history.unshift(place);
+    this.saveDB();
+  }
+
+  saveDB() {
+    const payload = {
+      history: this.history,
+    };
+    fs.writeFileSync(this.dbPath, JSON.stringify(payload));
+  }
+
+  readDB() {
+    if (fs.existsSync(this.dbPath))
+      this.history = JSON.parse(
+        fs.readFileSync(this.dbPath, { encoding: 'utf-8' })
+      ).history;
   }
 }
 
