@@ -12,19 +12,25 @@ const main = async () => {
     switch (option) {
       case 1:
         const searchTerm = await getInput('City:');
-        const places = await searchs.city(searchTerm);
-        const id = await listPlaces(places);
-        console.log(id);
-        await pause();
-        const { name, lat, lng } = places.find((place) => place.id === id);
 
-        console.log(`\n City Information\n`.green);
-        console.log('Ciudad:', name);
-        console.log('Lat:', lat);
-        console.log('Lng:', lng);
-        console.log('Temperature:');
-        console.log('Min:');
-        console.log('Max:');
+        const places = await searchs.city(searchTerm);
+
+        const id = await listPlaces(places);
+        if (id !== 0) {
+          const { name, lat, lng } = places.find((place) => place.id === id);
+
+          const { temperature, min, max, description } =
+            await searchs.weatherPlace(lat, lng);
+
+          console.log(`\nCity Information\n`.green);
+          console.log('City:'.blue, name.green);
+          console.log('Lat:'.blue, lat);
+          console.log('Lng:'.blue, lng);
+          console.log('Temperature:'.blue, temperature);
+          console.log('Min:'.blue, min);
+          console.log('Max:'.blue, max);
+          console.log('Weather description:'.blue, description.green);
+        }
         break;
     }
 
